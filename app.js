@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 
+
 const productRoutes = require('./api/routes/products');
 
 mongoose.connect('mongodb+srv://Hotdogs:' + process.env.MONGO_ATLAS_PW +'@hotdogs.tupazer.mongodb.net/?retryWrites=true&w=majority&appName=Hotdogs', 
@@ -12,6 +13,7 @@ mongoose.connect('mongodb+srv://Hotdogs:' + process.env.MONGO_ATLAS_PW +'@hotdog
 useNewUrlParser: true
 }
 );
+mongoose.Promise = global.Promise;
 
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended: false}));

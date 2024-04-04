@@ -2,14 +2,37 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/product');
 const mongoose = require('mongoose');
-const e = require('express');
+const multer = require('multer');
+
+
+
+
+
+
+
 
 router.get('/', (req, res, next) => {
 Product.find()
+.select('name price imgUrl _id ingredients')
 .exec()
 .then( docs => {
-    console.log(docs);
-    res.status(200).json(docs);
+    const response = {
+        count: docs.length,
+        products: docs.map(doc => {
+            return {
+              name:doc.name,
+              price: doc.price,
+              _id: doc._id,
+              imgUrl: doc.imgUrl,
+              ingredients: doc.ingredients,
+
+            }
+        })
+    }
+    
+    
+    
+    res.status(200).json(response);
 })
 .catch( error => {
     console.log(error)
@@ -19,22 +42,32 @@ Product.find()
 });
 });
 
-router.post('/', (req, res, next) => {
+router.post('/',(req, res, next) => {
    
 
     const product = new Product({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
         price: req.body.price,
-        imgUrl: req.body.imgUrl
+        imgUrl: req.body.imgUrl,
+        ingredients: req.body.ingredients
 });
 product
 .save()
 .then(result => {
     console.log(result)
     res.status(201).json({
-        message: 'handeling POST requests to /products',
-        createdProduct: result
+        message: 'Created new product',
+        createdProduct: {
+            _id: result._id,
+            name: result.name,
+            price: result.price,
+            imgUrl: result.imgUrl,
+            ingredients: result.ingredients
+
+
+
+        }
     
     });
 })
@@ -78,8 +111,11 @@ res.status(500).json({
         Product.updateOne({ _id: id }, {$set: updateOps })
         .exec()
         .then(result => {
-           console.log(result);
-           res.status(200).json(result);
+            res.status(200).json({
+                message: 'Product updated'
+            });
+           
+          
         })
         .catch( error => {
             console.log(error)
